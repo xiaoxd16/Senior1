@@ -1,0 +1,513 @@
+ qq	qq	q                                                                                                                                                                                                                                                                                      \documentclass{article}
+\usepackage{CJKutf8}
+\usepackage{amsmath}
+
+\begin{document}
+\begin{CJK}{UTF8}{gbsn}
+\section{光栅显示扫描系统}
+
+
+
+\section{光栅图形学}
+	基本图形的扫描转换(连续的图形转化为离散的点)\\
+	多边形的扫描转换和区域填充\\
+	裁剪\\
+	反走样(解决逼近误差)\\
+	投影(三维图形投影到二维)\\
+	消隐(消除不可见物体)\\
+\section{图形的扫描转换和区域填充}
+	\subsection{直线的扫描转换}
+	要考虑灰度亮度颜色效率等问题\\
+	常用算法：\\
+	\subsubsection{数值微分法(DDA)}
+	对于y=kx+b，每次取点(x,round(x))，然后可以减少乘法，$y_{i+1}-y_i=\Delta y=k$\\
+	对于斜率小于1的沿x方向步进，否则沿y方向步进\\
+	\subsubsection{中点划线法}	
+	主要优化DDA中的取整\\
+	确定某个点可能的两个位置重点和直线位置关系\\
+	需要判别式d=F(x,y)=ax+by+c\\
+	根据d与0的关系判断位置\\
+	同样使用增量计算进行优化\\
+	$a=y_0-y_1,b=x_0-x_1$\\
+	$d_0=F(x_0+1,y_0+0.5)=F(x_0,y_0)+a+0.5b=a+0.5b$\\
+	乘以2变成2d=2a+b把所有数变成整数\\
+	然后$\Delta_1=2a,\Delta_2=2a+2b$\\
+	\subsubsection{Bresenham算法}
+	通过误差项的符号进行计算\\
+	k=dy/dx,e=$d_0-0.5,e_{i+1}=e_{i}+k$\\
+	$e_{i}<0\rightarrow$右方\\
+	$e_{i}>0\rightarrow$右上方\\
+	\subsection{圆弧的扫描转换算法}
+	圆的特性：八对称性\\
+	整个圆只需要八分之一圆弧加对称性即可\\
+	\subsubsection{DDA}
+	计算复杂\\
+	\subsubsection{中点画圆法}
+	构造判别式$F(x,y)=x^2+y^2-R^2$\\
+	$d=F(M)=F(x_p+1)^2(y_p-0.5)^2-R^2$\\
+	\subsubsection{Bresenham算法}
+	和直线类似\\
+	\subsubsection{生成圆弧的正负法}
+	一个点在圆弧内，下一个点在圆弧外，判别式的符号不断变化\\
+	\subsubsection{圆的多边形逼近法}
+	当多边形边数足够多的时足够逼近圆\\
+	对于n边形，内角$\alpha=\frac{2\pi}{n}$\\
+	逼近误差$\delta=R-Rcos\frac{\alpha}{2}=R-Rcos\frac{\pi}{n}$\\
+	\subsection{多边形扫描转换}
+	线框显示$\rightarrow$面着色\\
+	多边形\\
+	外环:逆时针\\
+	内环:顺时针\\
+	\subsubsection{逐点判断法}
+	逐个像素判断\\
+	效率过低\\
+	\subsubsection{射线法}
+	有某个点发出射线，根据交点数量来判定在内部还是外部\\
+	但是和顶点相交需要特殊考虑(向其他方向发出射线，让他不过顶点)\\
+		\subsubsection{累计角度法}
+		向各个顶点发出射线，而边，无论是外环还是内环都会是有方向的，所以，可以决定角度角度的方向，逆时针或者顺时针，分别对应正负角度，求和，外部和为0，内部和为正负$\frac{\pi}{2}$\\
+		效率比较低，割裂了相邻像素间的关系\\
+	\subsubsection{扫描线算法}
+	求交:扫描线与多边形的交点，但是需要注意扫描线与多边形定点交点的取舍\\
+	排序:将交点进行排序\\
+	配对:确定内部与外部\\
+	填色
+	\subsubsection*{数据结构}
+	活性边表(AET)：把当前扫描线相交的边成为活性边，将它与扫描线的交点x坐标按递增顺序存放在链表中，保留了直线的连贯性和扫描线的连贯性\\
+	链表节点内容：当前扫描线与边的交点的x坐标\\
+	$\Delta x$：从当前扫描线到下一条线间x增量
+	$y_{max}$：改边所交最高扫描线号\\
+	新边表(NET)：存放该扫描线第一次出现的边，若谋变的较低端点为$y_{min}$，则该边就放在扫描线$y_{min}$的新边表中\\
+	新边表每个节点的数据：x坐标--斜率$\frac{dx}{dy}$--$y_{max}$\\
+	\subsubsection*{算法过程}
+	初始化新边表NET：\\
+	对于每条扫描线进行处理\\
+	while(扫描线未处理完)\\
+	\{\\
+	把新边表NET[y]中的边界点用插入排序法插入AET表，使之按x坐标递增\\
+	便利AET表，把配对焦点区间像素改变颜色\\
+	y=y+1\\
+	便利AET表，把$y_{max}=y$的节点从AET中删除，并把$y_{max}\ge y$节点的x值递增$\Delta x$\\
+	\}\\
+	\subsection{边缘填充法}
+	对于每条扫描线和个多边形边的交点，将该扫描线上交点\textbf{右方}的所有像素颜色取补，对多边形的每条边作此处理，与边顺序无关\\
+	缺点：一个点可能被访问多次，计算量大，不适合图像填充\\
+	优化：增加栅栏(与扫描线垂直的直线，通常过一丁点且把多边形分为左右两半)，把交点和栅栏之间的像素取补\\
+	\subsection{边界标志法}
+	对多边形的每条边进行直线扫描转换，也就是对多边形的边界所在像素打上标记\\
+	然后采用扫描线算法类似算法给每个像素打上位置标记\\
+	\subsection{区域填充算法}
+	4向连通区域vs8向连通区域\\
+	\subsubsection{递归算法}
+	填充每个点的4/8向连通点\\
+	\subsubsection{扫描线算法}
+	填充种子点所在扫描线位于给定区域的一个区段\\
+	确定与这一区段相连通的上下两条扫描线是哪个位于给定与区内的区段，保存下来，留作种子\\
+	重复上述步骤\\
+
+	
+\section{裁剪}
+\subsection{直线段裁剪}
+\subsubsection{直接求交法}
+	思想：\\
+两个端点都在窗口之内$\rightarrow$直线在窗口内\\
+两个端点同时位于窗口的左侧，右侧，上侧，下侧时$\rightarrow$直线在窗口外\\
+然后判断有效交点\\
+\subsubsection{Cohen-Sutherland裁剪}
+快速判断是否完全在边界外\\
+使用编码：$C_tC_bC_rC_l$\\
+\begin{equation}
+C_t=\left\lbrace 
+\begin{array}{l}
+1,y>y_r\\
+0,other\\
+\end{array}
+\right.\\
+C_b=\left\lbrace 
+\begin{array}{l}
+1,y<y_b\\
+0,other\\
+\end{array}
+\right.\\
+C_r=\left\lbrace 
+\begin{array}{l}
+1,x>x_r\\
+0,other\\
+\end{array}
+\right.\\
+C_l=\left\lbrace 
+\begin{array}{l}
+1,x<x_l\\
+0,other\\
+\end{array}
+\right.\\	
+\end{equation}
+算法过程：\\
+$P_1P_2$在窗口外$\Leftrightarrow\ code1\ \&\ code2 \neq 0$\\
+$P_1P_2$在窗口内$\Leftrightarrow\ code1=0\ \&\&\ code2= 0$\\
+$P_1$在窗口内，交换$P_1P_2$\\
+用$P_1P_2$和窗口边缘的交点取代$P_1$，算法继续\\
+
+	\subsubsection{中点分割裁剪算法}
+	优势：适合硬件实现\\
+	二分查找，按照上面的编码方法进行检查，最终收敛于交点或者子段足够小\\
+	\subsubsection{Nicholl-Lee-Nicholl算法}
+	主要消除C-S算法中的多次求交的情况\\
+	对2D平面的划分更为详细\\
+	\begin{table}
+	\centering
+	\caption{区域划分}
+	\begin{tabular}{|c|c|c|}
+		\hline
+		4&3&2\\
+		\hline
+		5&0&1\\
+		\hline
+		6&7&8\\
+		\hline
+	\end{tabular}
+	\end{table}
+	内部：0\\
+	角域：2,4,6,8\\
+	边域：1,3,5,7\\
+	算法：首先通过一定变换(交换，对称等)使$P_1$落在0,5,6区域\\
+	然后通过$P_1$做引到四个顶点的射线，把区域分为4部分，通过判断$P_2$在哪个区域来判定$P_1P_2$与窗口那些边相交\\
+	特点：效率较高，仅适合二维矩形\\
+	\subsubsection{梁友栋-Barsky算法}
+	首先排除与窗口某一条边向平行的线段\\
+	线段与其延长线和裁剪窗口的四条边所在直线有4个交点\\
+	根据始点$P_1$到终点$P_2$的方向记录4个交点，A,B,C,D，取A,B中离$P_2$近的点，取C,D中离$P_1$近的点\\
+	
+	\subsubsection{参数化算法(Lyrus-Beck算法)}
+	对于凸多边形区域R和直线段$P_1P_2$\\
+	$P(t)=(P_2-P_1)*t+P_1$\\
+	P(t)早凸多边形内的充要条件是，对于凸多边形边界上任意一点A和该点内法向N，都有：\\
+	$N\cdot(P(t)-A)>0$\\
+	当凸多边形是矩形窗口且矩形的边域坐标轴平行时，算法退化为Liang-Barsky算法\\
+	\subsection{多边形裁剪}
+	需要保证裁剪后仍然闭合\\
+	\subsubsection{Sutherland-Hodgeman算法}
+	多边形用顶点序列表示\\
+	逐次多边形裁剪\\
+	每次用窗口的一条边裁剪多边形，裁剪结果传递给下一条边\\
+	判断可见性\\
+	对于输入线段SP(S为起点，P为终点)\\
+	1.SP均不可见，输出0个顶点\\
+	2.SP均可见，输出P\\
+	3.S可见，P不可见，SP与边界交点为I，输出I\\
+	4.S不可见，P可见，SP与边界交点为I，输出I，P\\
+	缺陷：连续两个输出点中间的所有点不可见，而这连个点不在窗口同一边缘\\	
+	\subsubsection{Weiler-Atherton算法}
+	首先约定顶点序列的顺序：外环逆时针，内环顺时针\\
+	裁剪结果有主多边形的部分边界和裁剪多边形的部分边界共同组成\\
+	入点：主多边形边界由此进入裁剪多边形区域内部\\
+	出点：离开裁剪多边形区域进入主多边形边界内部\\
+	算法过程：\\
+	1.建立主多边形和裁剪多边形的顶点表\\
+	2.求交点，归类(出点还是入点)，按序插入顶点表，在两个表的响应顶点间建立双向指针\\
+	3.裁剪\\
+	3.1如果还有未跟踪的点，把它作为一个起点，建立新的裁剪结果多边形顶点表，插入该点\\
+	3.2如果该点为为入点，在主多边形顶点表内跟踪，否则在裁剪多边形顶点表内跟踪\\
+	3.3如果跟踪到的是多边形顶点，将其加入结果顶点表，继续，知道遇到新的交点，重复3.2-3.3，直至回到起点\\
+	\\
+	\section{字符}
+	\subsection{字库}
+	分为矢量型和点阵型良两种\\
+	矢量型存储量小，美观，变换方便，需要光栅化后才能显示\\
+	点阵型存储量大，易于显示\\
+	\section{图形变换与投影}
+	\subsection{图形变换}
+	\subsubsection{平移}
+	$$
+	P'=P+T=\begin{bmatrix}
+	P_x\\
+	P_y\end{bmatrix}
+	+\begin{bmatrix}
+	t_x\\t_y
+	\end{bmatrix}
+	$$
+	\subsubsection{旋转}
+	逆时针为正，旋转$\theta$\\
+	$$
+	P'=R\cdot P=\begin{bmatrix}
+	cos\theta&-sin\theta\\sin\theta&cos\theta
+	\end{bmatrix}
+	\begin{bmatrix}
+	p_x\\p_y
+	\end{bmatrix}
+	$$
+	\subsubsection{缩放}
+	$$P'=S\cdot P=\begin{bmatrix}
+	s_x&0\\0&s_y
+	\end{bmatrix}
+	\begin{bmatrix}
+	p_x\\p_y
+	\end{bmatrix}
+	$$
+	\subsection{齐次坐标}
+	$$
+	\begin{pmatrix}
+		x\\y
+	\end{pmatrix}
+	\Rightarrow\begin{pmatrix}
+		x_h\\y_h\\h
+	\end{pmatrix}
+	x_h=h\cdot x,y_h=h\cdot y,h\neq 0
+	$$
+	\subsubsection{平移}
+	$$\begin{bmatrix}
+	x'\\y'\\1	
+	\end{bmatrix}=\begin{bmatrix}
+	1&0&t_x\\0&1&t_y\\0&0&1
+	\end{bmatrix}
+	\begin{bmatrix}
+	x\\y\\1
+	\end{bmatrix}=T(t_x,t_y)\begin{bmatrix}
+	x\\y\\1
+	\end{bmatrix}
+	$$
+	\subsubsection{旋转}
+	$$\begin{bmatrix}
+	x'\\y'\\1	
+	\end{bmatrix}=\begin{bmatrix}
+	cos\theta&-sin\theta&0\\sin\theta&cos\theta&0\\0&0&1
+	\end{bmatrix}
+	\begin{bmatrix}
+	x\\y\\1
+	\end{bmatrix}=R(\theta)\begin{bmatrix}
+	x\\y\\1
+	\end{bmatrix}
+	$$
+	\subsubsection{比例变换}
+	$$\begin{bmatrix}
+	x'\\y'\\1	
+	\end{bmatrix}=\begin{bmatrix}
+	s_x&0&0\\0&s_y&0\\0&0&1
+	\end{bmatrix}
+	\begin{bmatrix}
+	x\\y\\1
+	\end{bmatrix}=S(s_x,s_y)\begin{bmatrix}
+	x\\y\\1
+	\end{bmatrix}
+	$$
+	\subsubsection{错切边换}
+	$$\begin{bmatrix}
+	x'\\y'\\1	
+	\end{bmatrix}=\begin{bmatrix}
+	1&b&0\\d&1&0\\0&0&1
+	\end{bmatrix}
+	\begin{bmatrix}
+	x\\y\\1
+	\end{bmatrix}
+	$$
+	沿x方向错切：d=0\\
+	沿y方向错切：b=0\\
+	沿x,y方向错切：b$\neq$0且d$\neq$0\\
+	\subsubsection{仿射变换}
+	$$
+	A_f=
+	\begin{bmatrix}
+	a&b&e\\c&d&f\\0&0&1
+	\end{bmatrix}
+	$$
+	\subsection{二维图形的显示流程}
+	坐标系Coordinate System\\
+	世界坐标系WCS\\
+	用户坐标系UCS\\
+	局部坐标系LCS\\
+	造型坐标系MCS\\
+	屏幕坐标系SCS\\
+	设备坐标系DCS\\
+	\subsubsection{窗口到市区的变换}
+	窗口：左下角$(x_{min},y_{min})$，长宽$E_x,E_y$\\
+	视口：左下角$(u_{min},v_{min})$，长宽$E_u,E_v$\\
+	转换矩阵\\
+	$$
+	M_{wv}=T(u_{min},v_{min})S(\frac{E_u}{E_x},\frac{E_v}{E_y})T(-x_{min},-y_{min})
+	$$
+	\subsection{三维几何变换}
+	\subsubsection{三维齐次坐标}
+	$$
+	\begin{pmatrix}
+	x\\y\\z
+	\end{pmatrix}
+	\Rightarrow\begin{pmatrix}
+	x_h\\y_h\\z_h\\h
+	\end{pmatrix},x_h=h\cdot x,y_h=h\cdot y,z_h=h\cdot z,h\neq 0\\
+	$$
+	\subsubsection{三维变换的一般形式}
+	$$
+	\begin{bmatrix}
+	a_{11}&a_{12}&a_{13}&a_{14}\\
+	a_{21}&a_{22}&a_{23}&a_{24}\\
+	a_{31}&a_{32}&a_{33}&a_{34}\\
+	0&0&0&1
+	\end{bmatrix}
+	$$
+	\subsubsection{三维坐标的之间的变换}
+	P在原坐标系坐标\\
+	$$
+	P=\begin{bmatrix}
+	p_x\\p_y\\p_z
+	\end{bmatrix}
+	$$
+	新的坐标系原点\\
+	$$
+	C'=\begin{bmatrix}
+	c_x'\\c_y'\\c_z'
+	\end{bmatrix}
+	$$
+	新的坐标系单位向量\\
+	$$
+	X'=\begin{bmatrix}
+	x_1'\\x_2'\\x_3'
+	\end{bmatrix}
+	Y'=\begin{bmatrix}
+	y_1'\\y_2'\\y_3'
+	\end{bmatrix}
+	Z'=\begin{bmatrix}
+	z_1'\\z_2'\\z_3'
+	\end{bmatrix}
+	$$
+	新坐标系\\
+	$$
+	P\rightarrow P':\\
+	P'=\begin{bmatrix}
+	p_x'\\p_y'\\p_z'\\1
+	\end{bmatrix}=R\cdot T\cdot P\\
+	=\begin{bmatrix}
+	x_1'&x_2'&x_3'&0\\
+	y_1'&y_2'&y_3'&0\\
+	z_1'&z_2'&z_3'&0\\
+	0&0&0&1
+	\end{bmatrix}
+	$$
+	\\
+	$$
+	P'\rightarrow P:\\
+	P=\begin{bmatrix}
+	p_x\\p_y\\p_z
+	\end{bmatrix}=C'+(p_x'X'+p_y'Y'+p_z'Z')\\
+	$$
+	\subsection{投影变换}
+	投影变换：三维物体转换为二维图形表示的过程\\
+	\subsubsection{投影分类}
+	平行投影：正平行投影，斜平行投影\\
+	透视投影：一点透视，二点透视，三点透视(主要由投影平面和xyz轴的平行关系决定，平行的越多，，灭点越少)\\
+	三视图是平行投影\\
+	灭点：不平行于投影平面的平行线经过透视投影后收敛于一点\\
+	主灭点：平行于坐标轴的平行线的灭点\\
+	\subsubsection{观察坐标系}
+	世界坐标系$\Rightarrow$观察坐标系\\
+	观察坐标系的远点在世界坐标系的位置$(O_{vx},O_{vy},O_{vz})$\\
+	观察坐标系的三个坐标轴向量$(X_{vx},X_{vy},X_{vz}),(Y_{vx},Y_{vy},Y_{vz}),(Z_{vx},Z_{vy}),Z_{vz}$\\
+	变换矩阵\\
+	$$
+	M_{W\rightarrow V}=R\cdot T\\
+	$$
+	$$
+	R = \begin{bmatrix}
+	X_{vx}&X_{vy}&X_{vz}&0\\
+	Y_{vx}&Y_{vy}&Y_{vz}&0\\
+	Z_{vx}&Z_{vy}&Z_{vz}&0\\
+	0&0&0&1
+	\end{bmatrix}\\
+	T=\begin{bmatrix}
+	1&0&0&-O_{vx}\\
+	0&1&0&-O_{vy}\\
+	0&0&1&-O_{vz}\\
+	0&0&0&1
+	\end{bmatrix}
+	$$
+	\subsection{三维裁剪}
+	合二维裁剪类似，可以通过参数方程，也可以通过判别式\\
+	\subsection{透视投影变换}
+	投影平面$Z_V=0$，投影中心(0,0,d)，待投影点$P(x_P,y_p,z_p)$，求投影点$Q(x_Q,y_Q,z_Q)$\\
+	透视投影变换矩阵\\
+	\begin{equation*}
+	\begin{split}	
+	M_{per}=\begin{bmatrix}
+	1&0&0&0\\
+	0&1&0&0\\
+	0&0&0&0\\
+	0&0&-\frac{1}{d}&1
+	\end{bmatrix}\\
+	Q=M_{per}\cdot P\\
+	\end{split}
+	\end{equation*}
+	
+	\subsection{平行投影变换}
+	投影平面$Z_V=0$，投影方向(0,0,-1)，待投影点$P(x_P,y_p,z_p)$，求投影点$Q(x_Q,y_Q,z_Q)$\\
+	透视投影变换矩阵\\
+	\begin{equation*}
+	\begin{split}	
+	M_{ort}=\begin{bmatrix}
+	1&0&0&0\\
+	0&1&0&0\\
+	0&0&0&0\\
+	0&0&0&1
+	\end{bmatrix}\\
+	Q=M_{ort}\cdot P\\
+	\lim\limits_{d\rightarrow \infty}M_{per}=M_{ort}\\
+	\end{split}
+	\end{equation*}
+	\subsection{反走样}
+	用离散量表示连续梁引起的失真现象称为走样\\
+	用于减少或消除失真效果的技术成为反走样\\
+	\subsubsection{提高分辨率}
+	锯齿仍然存在，数量更多，宽度更小\\
+	只能减轻，不能消除锯齿\\
+	\subsubsection{超采样}
+	以更高的分辨率进行采样，最终进行一定的平均\\
+	\subsubsection{区域采样}
+	通过每个像素与目标图形的相交区域面积确定该像素的亮度\\
+	为简化计算可以采用离散的方法\\
+	存在的问题：计算比较复杂，并且中心和边缘对亮度的贡献不应该一样\\
+	\subsubsection{加权区域采样}
+	解决了上面贡献度不同的问题\\
+	使用圆锥滤波器进行积分\\
+	\subsubsection{随机采样}
+	均匀采样会引起干涉纹理(Moire Pattern)\\
+	所以采用随机采样，但是随机采样会导致一定的模糊\\
+	\subsubsection{抖动采样}
+	加上某种限定的随机采样\\
+	
+	\section{消隐}
+	为了真实地反映不同物体之间或物体的不同部分之间由于遮挡而造成的某些物体或部分的不可见现象，须把不可见部分从图中消除，称为消除隐藏线和消除隐藏面，简称消隐，也称为可见面检测。\\
+	投影变换失去了深度信息，往往导致二义性
+	
+	
+	\subsection{三维物体的表示}
+	构造实体表示(CSG)：不唯一但是适合交互\\
+	边界表示(B-rep)：体-面-环(一个面由一个外环和多个内环组成)-边-点\\
+	
+	\subsection{线消隐算法}
+	
+	
+	\section{title}
+	\subsection{如何绘制立方体}
+	顶点，面，三角形\\
+	局部坐标系\\
+	贴图\\
+	观察者\\
+	遮挡\\
+	光照(阴影、高光)\\
+	显示\\
+	\subsection{OPENGL库}
+	核心库：GL\\
+	功能库：GLU\\
+	\subsection{OPENGL功能}
+	物体描述(建模)\\
+	变换(几何变换、投影变换、视口变换)\\
+	颜色模式\\
+	像素处理(像素、位图、字体、图形处理、贴图、抗锯齿)\\
+	\subsection{GLM}
+	矩阵变换\\
+	\textbf{四元数}\\
+	\subsection{几何变换}
+	观察变换\\
+	建立观察坐标系(u,v,w)\\
+	
+	
+\end{CJK}
+\end{document}

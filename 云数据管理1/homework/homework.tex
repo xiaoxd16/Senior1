@@ -1,0 +1,43 @@
+\documentclass{article}
+\usepackage{CJKutf8}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\begin{document}
+	\begin{CJK}{UTF8}{gbsn}
+	\section*{3.2}
+	$m_1:RESP="Manager"\land DUR<20$\\
+	$m_2:RESP="Manager"\land DUR\ge 20$\\
+	$m_3:RESP="Analyst"\land DUR<20$\\
+	$m_4:RESP="Analyst"\land DUR\ge 20$\\
+	$m_5:RESP="Consultant"\land DUR<20$\\
+	$m_6:RESP="Consultant"\land DUR\ge 20$\\
+	$m_7:RESP="Engineer"\land DUR<20$\\
+	$m_8:RESP="Engineer"\land DUR\ge 20$\\
+	$m_9:RESP="Programmer"\land DUR<20$\\
+	$m_{10}:RESP="Programmer"\land DUR\ge20$\\
+	\section*{3.3}	
+	\begin{equation*}
+	\begin{array}{l|l|l|l}
+		ENO&ENAME&TITLE&SAL\\
+		E1&J.Doe&Elect.Eng,&40000\\
+		E2&M.Smith&Syst.Anal.&34000\\
+		E3&A.Lee&Mech.Eng.&27000\\
+		E4&J.Miller&Programmer&24000\\
+		E5&B.Casey&Syst.Anal.&34000\\
+		E6&L.Chu&Elect.Eng.&40000\\
+		E7&R.Davis&Mech.Eng.&27000\\
+		E8&J.Jones&Syst.Anal.&34000\\
+	\end{array}	
+	\end{equation*}
+	Definitly, this is partitioned\\
+	$EMP_1=\sigma_{TITLE="Elect.Eng."\land SAL \ge 30000}$\\
+	$EMP_2=\sigma_{TITLE="Syst.Anal."\land SAL \ge 30000}$\\
+	$EMP_3=\sigma_{TITLE="Programmer"\land SAL < 30000}$\\
+	$EMP_4=\sigma_{TITLE="Mech.Eng."\land SAL < 30000}$\\
+	\\
+	$RESULT_1=EMP_1\ltimes PAY_1$\\
+	$RESULT_2=EMP_2\ltimes PAY_1$\\
+	$RESULT_3=EMP_3\ltimes PAY_2$\\
+	$RESULT_4=	EMP_4\ltimes PAY_2$\\	
+	\end{CJK}
+\end{document}

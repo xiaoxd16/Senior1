@@ -1,0 +1,85 @@
+\documentclass{article}
+\usepackage{CJKutf8}
+\usepackage{amsmath}
+
+\begin{document}
+\begin{CJK}{UTF8}{gbsn}
+	\section{分析工具}
+	\subsection{静态分析}
+		工业界：Converity，Foritify\\
+		学术界：CBMC,Frama-C\\
+		价格昂贵，运行快，覆盖面广\\	
+	\subsection{动态分析}
+		工业界：Peach(测试协议)，Tsanitizer\\
+		学术界：Calfuzzer，Maple\\
+		隐私风险，代码泄露的可能，不完备，比如死锁、原子性违反等\\
+	\subsection{代码生成}
+		工业界：Simulink，SCADE\\
+		学术界：Ptolemy，Metro-Polis\\
+		技术封闭，无法有针对性优化\\
+	
+	\section{可信构造}
+	图形化建模$\rightarrow$图形化仿真$\rightarrow$验证转换$\rightarrow$代码生成\\
+	\subsection{正向建模的问题}
+	如何建模\\
+	建模后如何分析\\
+	代码生成器正确性\\
+	\subsection{逆向建模}
+	
+	找到模型的缺陷\\
+	
+    符号执行\\
+    
+	\section{CPS的问题}
+	Reliability\\
+	Safety\\
+	
+	
+	
+	\section{Model-Driven Design}
+	关键步骤：设计正确，实现和设计一致\\
+	需要工具：从需求抽取Model，证明Model正确，implementation正确的度量\\
+	
+	Read Time Protocol：Connection，Transfer，Disconnection\\
+	
+	\subsection{Ongoing Work}
+	Dynamic analysis of Embedded Code()\\
+	Dynamic analysis of CPS()\\
+	Dynamic analysus of Model(Concurrency Bug Detection)\\
+	
+	\section{编程语言和建模与烦的发展和边界}
+	
+	
+	
+	\section{SCADE}
+	\subsection*{UML优缺点}
+	可以建模方法之间的交互关系，但是方法内部行为的刻画不清晰\\
+	\subsection{SCADE优点}
+	降低开发难度，成本\\
+	\subsection{组分}
+	SSM(Safe Scade Matine)\\
+	
+	\subsection{Mealy机和Moore机}
+	输出与迁移绑定：Mealy机\\
+	输出与状态绑定：Moore机\\
+	
+	Strong Abortion：entering+in，也就是立刻跳出\\
+	Weak Abortion：entering+in+exiting，也就是当前时刻可能跳出也可能不跳出\\
+	\subsection{Priority机制}
+	允许两个用户互斥的访问一个资源\\
+	需要仲裁控制器\\
+	SSM保证如果有多可可选项，最终结果是确定的，而不是随机选择\\
+	
+	Embedded：强调交流\\
+	Hybrid：强调连续和离散\\
+	CPS：强调控制算法\\
+	
+	HS：Company+Acu+Sensity+Physical\\
+	Control:Discrete+Company+Acu+Sensity+Physical\\
+	Embeed:Discrete+Company+Acu+Sensity\\
+	CPS:Discrete+Company+Acu+Sensity+Physical+Communication\\
+	\section{Ptolemy}
+	
+
+\end{CJK}
+\end{document}
