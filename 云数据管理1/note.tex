@@ -112,10 +112,45 @@
 	$R_i=\sigma_{F_i}(R),1\leq i\leq w$\\
 	其中，$F_i$应当是最小项谓词\\	
 	\subsubsection*{Derived Horizontal Fragmentation}
+	输入:属从关系的划分集合、成员关系、属主和成员之间的半连接谓词\\
 	
 	
 	\subsection*{垂直分割(Vertical Fragmentation)}
 	需要复制主键，按属性切割\\
+	\subsubsection*{信息需求}
+	$Q=\{q_1,q_2,...,q_q\}$是访问关系$R(A_1,A_2,...,A_n)$的用户查询(应用)\\
+	属性使用值:\\
+	\begin{equation*}
+	use(q_i,A_j)=\begin{cases}
+	1\ if\ attributes\ A_j\ referenced\ by\ query\ q_i\\
+	0\ otherwise\\
+	\end{cases}
+	\end{equation*}
+	简而言之，如果$A_j$使用到了$q_i$(比如select中使用到)，那么$use(q_i,A_j)=1$\\
+	下面定义亲和度矩阵(Attribute Affinity Matrix, AA)\\
+	\begin{equation*}
+	aff(A_i,A_j)=\sum_{k|use(q_k,A_i)=1\land use(q_k,A_j)=1}\sum_{\forall S_l} ref_l(q_k)*acc_l(q_k)
+	\end{equation*}
+	其中$ref_l(q_k)$表示站点$S_l$中执行$q_k$时访问属性$(A_i,A_j)$的次数\\
+	$acc_l(q_k)$表示应用的访问频率度量\\
+	\subsubsection*{聚类算法}
+	目标:调整属性排列顺序，使得属性亲和度值大小相近的在一起，使得全局亲和度度量(Global Affinity Measure,AM)最大\\
+	算法:BEA算法-$O(n^2)$\\
+	\begin{equation*}
+	AM=\sum_{i=1}^{n}\sum_{j=1}^naff(A_i,A_j)[aff(A_i,A_{j-1})+aff(A_i,A_{j+1})+aff(A_{i-1},A_j)+aff(A_{i+1},A_j)]
+	\end{equation*}	
+	其中\\
+	\begin{equation*}
+	aff(A_0,A_j) = aff(A_{n+1},A_j)=aff(A_i,A_0)=aff(A_i,A_{n+1})=0
+	\end{equation*}
+	考虑到属性亲和度矩阵的对称性($AA=AA^T$)\\
+	\begin{equation*}
+	AM=\sum_{i=1}^{n}\sum_{j=1}^naff(A_i,A_j)[aff(A_i,A_{j-1})+aff(A_i,A_{j+1})]
+	\end{equation*}	
+	算法步骤:\\
+	1.初始化:任意选择一列，放入CA\\
+	2.迭代:注意选取剩下的列，把它分别插入CA的不同位置，找到使得AM最大的位置，进行插入\\
+	3.排序:没有列剩余时，调整相应行列的顺序\\
 	\subsection*{混合切割(Mixed Fragmentation)}
 	综合上面二者进行切割\\
 	\subsection*{如何确保分割的正确性}
