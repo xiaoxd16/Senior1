@@ -143,6 +143,7 @@
 	\begin{equation*}
 	aff(A_0,A_j) = aff(A_{n+1},A_j)=aff(A_i,A_0)=aff(A_i,A_{n+1})=0
 	\end{equation*}
+	简单来说，找到那些同时使用了$A_i,A_j$的q，把他们的应用频率乘以权重相加\\
 	考虑到属性亲和度矩阵的对称性($AA=AA^T$)\\
 	\begin{equation*}
 	AM=\sum_{i=1}^{n}\sum_{j=1}^naff(A_i,A_j)[aff(A_i,A_{j-1})+aff(A_i,A_{j+1})]
@@ -150,7 +151,11 @@
 	算法步骤:\\
 	1.初始化:任意选择一列，放入CA\\
 	2.迭代:注意选取剩下的列，把它分别插入CA的不同位置，找到使得AM最大的位置，进行插入\\
-	3.排序:没有列剩余时，调整相应行列的顺序\\
+	3.排序:没有列剩余时，调整相应行列的顺序(遇到相同值随机插入)\\
+	\subsubsection*{划分算法}
+	目标：在聚类后找到合适的划分点\\
+	
+	
 	\subsection*{混合切割(Mixed Fragmentation)}
 	综合上面二者进行切割\\
 	\subsection*{如何确保分割的正确性}
@@ -243,5 +248,17 @@
 	
 	\subsubsection*{GFS的容错机制}
 	三类元数据，前两类可以使用log恢复，最后通过备份恢复\\
+	
+	
+	\section*{title}
+	数据仓库：价格贵，只支持结构化数据\\
+	
+	
+	g：
+	s:
+	m:
+	
+	OLTP:也叫联机事务处理(Online Transaction Processing),强调数据库内存效率，强调内存各种指标的命令率，强调绑定变量，强调并发操作\\
+	OLAP:也叫联机分析处理(Online Analytical Processing),强调数据分析，强调SQL执行市场，强调磁盘I/O，强调分区等\\
 \end{CJK}
 \end{document}

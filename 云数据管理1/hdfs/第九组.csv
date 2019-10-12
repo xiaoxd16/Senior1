@@ -1,0 +1,4 @@
+﻿ID,实例名,状态,地域,可用区,实例类型,操作系统,镜像ID,CPU,内存(GB),公网带宽(Mbps),公网IP,内网IP,系统盘类型,系统盘大小(GB),组别,默认账号,默认密码
+ins-5xvea5c7,25,运行中,北京,北京一区,标准型S2,Ubuntu Server 16.04.1 LTS 64位,img-pyqx34y1,4,8,4,192.144.225.39,172.21.0.34,CLOUD_PREMIUM,100,9,ubuntu,s3W:2zeQD+7rC#
+ins-cu1u5qyt,26,运行中,北京,北京一区,标准型S2,Ubuntu Server 16.04.1 LTS 64位,img-pyqx34y1,4,8,4,49.232.143.169,172.21.0.12,CLOUD_PREMIUM,100,9,ubuntu,s3W:2zeQD+7rC#
+ins-5dwqqkpx,27,运行中,北京,北京一区,标准型S2,Ubuntu Server 16.04.1 LTS 64位,img-pyqx34y1,4,8,4,49.232.94.191,172.21.0.19,CLOUD_PREMIUM,100,9,ubuntu,s3W:2zeQD+7rC#
